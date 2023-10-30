@@ -1,0 +1,16 @@
+{
+    "name": "XsollaSamplesDemo",
+    "references": [
+        "GUID:ae0cf701846f0cc4bbd067c4edd4fe90",
+        "GUID:9a55a7ff9c96c45c496247b3237899e8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

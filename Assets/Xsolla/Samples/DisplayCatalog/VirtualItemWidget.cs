@@ -10,5 +10,6 @@ namespace Xsolla.Samples.DisplayCatalog
 		public Text DescriptionText;
 		public Text PriceText;
 		public Image IconImage;
+		public Button BuyButton;
 	}
 }
