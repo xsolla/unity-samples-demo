@@ -1,60 +1,54 @@
 using UnityEngine;
 using Xsolla.Core;
 
-namespace XsollaSamplesDemo
+public class GameController : MonoBehaviour
 {
-    public class GameController : MonoBehaviour
+    // Declaration of variables prefabs for UI pages
+    public Transform PageContainer;
+    public AuthPage AuthPagePrefab;
+    public CatalogPage CatalogPagePrefab;
+    public PopupPage PopupPagePrefab;
+
+    // Current opened page
+    private MonoBehaviour CurrentPage;
+
+    private void Start()
     {
-        // Declaration of variables prefabs for UI pages
-        public Transform PageContainer;
-        public ErrorPopup ErrorPopupPrefab;
-        public PurchasePopup PurchasePopupPrefab;
-        public AuthHubPage AuthHubPagePrefab;
-        public RegistrationPage RegistrationPagePrefab;
-        public SignInPage SignInPagePrefab;
-        public VirtualItemsPage VirtualItemsPagePrefab;
+        // Subscribing to sign in events
+        AuthPage.SignInSuccess += () => TogglePage(CatalogPagePrefab);
+        AuthPage.SignInError += ShowErrorMessage;
 
-        // Current opened page
-        private MonoBehaviour CurrentPage;
+        // Subscribing to virtual items events
+        CatalogPage.PurchaseSuccess += ShowPurchaseSuccessMessage;
+        CatalogPage.ItemsRequestError += ShowErrorMessage;
 
-        private void Start()
-        {
-            // Registering the event handlers for error cases
-            RegistrationPage.RegistrationError += ShowErrorPopup;
-            SignInPage.SignInError += ShowErrorPopup;
-            VirtualItemsPage.ItemsRequestError += ShowErrorPopup;
+        // Opening the SignIn page
+        TogglePage(AuthPagePrefab);
+    }
 
-            // Registering the event handlers
-            AuthHubPage.RegisterButtonClicked += () => TogglePage(RegistrationPagePrefab);
-            AuthHubPage.SignInButtonClicked += () => TogglePage(SignInPagePrefab);
-            RegistrationPage.RegistrationSuccess += () => TogglePage(SignInPagePrefab);
-            SignInPage.SignInSuccess += () => TogglePage(VirtualItemsPagePrefab);
-            VirtualItemsPage.PurchaseSuccess += ShowPurchasePopup;
+    private void TogglePage<TPage>(TPage prefab) where TPage : MonoBehaviour
+    {
+        // Destroying the current page if it exists
+        if (CurrentPage != null)
+            Destroy(CurrentPage.gameObject);
 
-            // Opening the AuthHub page
-            TogglePage(AuthHubPagePrefab);
-        }
+        // Instantiating the new page
+        CurrentPage = Instantiate(prefab, PageContainer, false);
+    }
 
-        private void TogglePage<TPage>(TPage prefab) where TPage : MonoBehaviour
-        {
-            // Destroying the current page if it exists
-            if (CurrentPage != null)
-                Destroy(CurrentPage.gameObject);
+    private void ShowErrorMessage(Error error)
+    {
+        // Instantiating the error popup and setting the error message 
+        var page = Instantiate(PopupPagePrefab, PageContainer, false);
+        page.TitleText.text = "Error";
+        page.MessageText.text = error.errorMessage;
+    }
 
-            // Instantiating the new page
-            CurrentPage = Instantiate(prefab, PageContainer, false);
-        }
-
-        private void ShowErrorPopup(Error error)
-        {
-            // Instantiating the error popup and setting the error message
-            Instantiate(ErrorPopupPrefab, PageContainer, false).ErrorMessageText.text = error.errorMessage;
-        }
-
-        private void ShowPurchasePopup(OrderStatus orderStatus)
-        {
-            // Instantiating the purchase popup
-            Instantiate(PurchasePopupPrefab, PageContainer, false);
-        }
+    private void ShowPurchaseSuccessMessage(OrderStatus orderStatus)
+    {
+        // Instantiating the success popup and setting the info message
+        var page = Instantiate(PopupPagePrefab, PageContainer, false);
+        page.TitleText.text = "Success";
+        page.MessageText.text = "Purchase completed successfully";
     }
 }
